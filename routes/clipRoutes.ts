@@ -19,7 +19,7 @@ router.get('/clips/fetch', async (req: Request, res: Response) => {
         );
 
         const clipData = clipQuery.rows;
-        res.json({ clips: clipData });
+        res.json({ data: clipData });
     } catch (error) {
         console.error('Error fetching clips:', error);
         res.status(500).json({ error: 'Internal Server Error' });
