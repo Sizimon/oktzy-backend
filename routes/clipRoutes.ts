@@ -33,7 +33,7 @@ router.post('/clips/create', async (req: Request, res: Response) => {
     try {
         const result = await pool.query(
             'INSERT INTO clips (user_id, title, clip_url, timestamps) VALUES ($1, $2, $3, $4) RETURNING *',
-            [userId, title, clipUrl, timestamps]
+            [userId, title, clipUrl, JSON.stringify(timestamps)]
         );
 
         const newClip = result.rows[0];
