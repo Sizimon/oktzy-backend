@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import pool from '../db/dbConnection';
+import pool from '../db/dbConnection.js';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
-import { authMiddleware } from '../authMiddleware';
+import { authMiddleware } from '../authMiddleware.js';
 
 dotenv.config();
 
@@ -34,7 +34,7 @@ router.post('/auth/register', async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const result = await pool.query(
-            'INSERT INTO users (email, username, password) VALUES ($1, $2, $3)',
+            'INSERT INTO users (email, username, password_hash) VALUES ($1, $2, $3) RETURNING *',
             [email, username, hashedPassword]
         );
 
@@ -50,7 +50,8 @@ router.post('/auth/register', async (req: Request, res: Response) => {
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         console.error('Error registering user:', error);
-        res.status(500).json({ message: `${error.message}` });
+        const message = error instanceof Error ? error.message : String(error);
+        res.status(500).json({ message });
     }
 });
 

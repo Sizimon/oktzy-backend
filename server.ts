@@ -1,8 +1,8 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes';
-import clipRoutes from './routes/clipRoutes';
+import authRoutes from './routes/authRoutes.js';
+import clipRoutes from './routes/clipRoutes.js';
 
 const app = express();
 
