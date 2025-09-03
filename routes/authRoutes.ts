@@ -38,9 +38,9 @@ router.post('/auth/register', async (req: Request, res: Response) => {
             [email, username, hashedPassword]
         );
 
-        const user = result.rows[0];
+        const newUser = result.rows[0];
 
-        const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ userId: newUser.id }, JWT_SECRET, { expiresIn: '7d' });
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -77,7 +77,7 @@ router.post('/auth/login', async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',

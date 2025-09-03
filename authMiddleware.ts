@@ -16,7 +16,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
         return;
     }
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload & { userId: number };
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
         req.user = { id: decoded.userId };
 
         // Issue a new token with 7d expiry
