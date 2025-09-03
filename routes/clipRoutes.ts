@@ -37,7 +37,7 @@ router.post('/clips/create', async (req: Request, res: Response) => {
         );
 
         const newClip = result.rows[0];
-        res.status(201).json({ message: 'Clip created successfully', clip: newClip });
+        res.status(201).json({ message: 'Clip created successfully', data: newClip });
     } catch (error) {
         console.error('Error creating clip:', error);
         res.status(500).json({ error: 'Internal Server Error' });
