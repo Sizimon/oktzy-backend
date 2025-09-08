@@ -45,4 +45,23 @@ router.post('/clips/create', async (req: Request, res: Response) => {
     }
 });
 
+router.put('/clips/update/:clipId', async (req: Request, res: Response) => {
+    const { clipId } = req.params;
+    const { title, timestamps } = req.body;
+    const userId = req.user?.id;
+
+    try {
+        const result = await pool.query(
+            'UPDATE clips SET title = $1, timestamps = $2 WHERE id = $3 AND user_id = $4 RETURNING *',
+            [title, JSON.stringify(timestamps), clipId, userId]
+        );
+
+        const updatedClip = result.rows[0];
+        res.json({ message: 'Clip updated successfully', data: updatedClip });
+    } catch (error) {
+        console.error('Error updating clip:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 export default router;
