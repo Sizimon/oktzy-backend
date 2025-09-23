@@ -9,7 +9,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use(cors({
-    origin: 'http://oktzy.com',
+    origin: 'https://oktzy.com',
     credentials: true
 }));
 app.use(cookieParser());
