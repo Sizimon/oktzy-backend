@@ -64,4 +64,27 @@ router.put('/clips/update/:clipId', async (req: Request, res: Response) => {
     }
 });
 
+router.delete('/clips/delete/:clipId', async (req: Request, res: Response) => {
+    const { clipId } = req.params;
+    const userId = req.user?.id;
+
+    try {
+        const result = await pool.query(
+            'DELETE FROM clips WHERE id = $1 AND user_id = $2 RETURNING *',
+            [clipId, userId]
+        );
+
+        const deletedClip = result.rows[0];
+        if (!deletedClip) {
+            res.status(404).json({ error: 'Clip not found or you do not have permission to delete it' });
+            return;
+        }
+
+        res.json({ message: 'Clip deleted successfully', data: deletedClip });
+    } catch (error) {
+        console.error('Error deleting clip:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 export default router;
