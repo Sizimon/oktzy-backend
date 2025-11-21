@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import pool from '../db/dbConnection.js';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
@@ -13,8 +14,16 @@ if (!JWT_SECRET) {
     throw new Error('JWT_SECRET is not defined');
 }
 
+const authLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 10, // limit each IP to 10 requests per windowMs
+    message: {
+        error: 'Too many requests from this IP, please try again later.'
+    }
+});
 
-router.post('/auth/register', async (req: Request, res: Response) => {
+
+router.post('/auth/register', authLimiter, async (req: Request, res: Response) => {
     try {
         const { email, username, password } = req.body;
 
@@ -55,7 +64,7 @@ router.post('/auth/register', async (req: Request, res: Response) => {
     }
 });
 
-router.post('/auth/login', async (req: Request, res: Response) => {
+router.post('/auth/login', authLimiter, async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -92,7 +101,7 @@ router.post('/auth/login', async (req: Request, res: Response) => {
     }
 });
 
-router.get('/auth/me', authMiddleware, async (req: Request, res: Response) => {
+router.get('/auth/me', authLimiter, authMiddleware, async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
         if (!userId) {

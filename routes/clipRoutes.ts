@@ -1,11 +1,20 @@
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { authMiddleware } from '../authMiddleware.js';
 import pool from '../db/dbConnection.js';
 
 const router = Router();
 router.use(authMiddleware);
 
-router.get('/clips/fetch', async (req: Request, res: Response) => {
+const clipLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 20, // limit each IP to 30 requests per windowMs
+    message: {
+        error: 'Too many requests from this IP, please try again later.'
+    }
+});
+
+router.get('/clips/fetch', clipLimiter, async (req: Request, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -26,7 +35,7 @@ router.get('/clips/fetch', async (req: Request, res: Response) => {
     }
 });
 
-router.post('/clips/create', async (req: Request, res: Response) => {
+router.post('/clips/create', clipLimiter, async (req: Request, res: Response) => {
     const { title, clipUrl, timestamps } = req.body;
     const userId = req.user?.id;
 
@@ -45,7 +54,7 @@ router.post('/clips/create', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/clips/update/:clipId', async (req: Request, res: Response) => {
+router.put('/clips/update/:clipId', clipLimiter, async (req: Request, res: Response) => {
     const { clipId } = req.params;
     const { title, timestamps } = req.body;
     const userId = req.user?.id;
