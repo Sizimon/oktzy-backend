@@ -25,7 +25,7 @@ const authLimiter = rateLimit({
 
 const metrics = metricMiddleware({
     service: 'auth-service',
-    url: 'http://localhost:5007/metrics'
+    url: 'https://szymonsamus.dev/api/metrics'
 });
 
 

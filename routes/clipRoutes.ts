@@ -1,10 +1,17 @@
 import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { authMiddleware } from '../authMiddleware.js';
+import { metricMiddleware } from '../metricMiddleware.js';
 import pool from '../db/dbConnection.js';
 
+const metrics = metricMiddleware({
+    service: 'clip-service',
+    url: 'https://szymonsamus.dev/api/metrics'
+});
+
 const router = Router();
-router.use(authMiddleware);
+router.use(metrics); // Apply metrics middleware to all routes in this router
+router.use(authMiddleware); // Apply authentication middleware to all routes in this router
 
 const clipLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
@@ -73,7 +80,7 @@ router.put('/clips/update/:clipId', clipLimiter, async (req: Request, res: Respo
     }
 });
 
-router.delete('/clips/delete/:clipId', async (req: Request, res: Response) => {
+router.delete('/clips/delete/:clipId', clipLimiter, async (req: Request, res: Response) => {
     const { clipId } = req.params;
     const userId = req.user?.id;
 
