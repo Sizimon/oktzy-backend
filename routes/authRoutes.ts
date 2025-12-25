@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import { authMiddleware } from '../authMiddleware.js';
+import { metricMiddleware } from '../metricMiddleware.js';
 
 dotenv.config();
 
@@ -22,8 +23,13 @@ const authLimiter = rateLimit({
     }
 });
 
+const metrics = metricMiddleware({
+    service: 'auth-service',
+    url: 'http://localhost:5007/metrics'
+});
 
-router.post('/auth/register', authLimiter, async (req: Request, res: Response) => {
+
+router.post('/auth/register', authLimiter, metrics, async (req: Request, res: Response) => {
     try {
         const { email, username, password } = req.body;
 
@@ -64,7 +70,7 @@ router.post('/auth/register', authLimiter, async (req: Request, res: Response) =
     }
 });
 
-router.post('/auth/login', authLimiter, async (req: Request, res: Response) => {
+router.post('/auth/login', authLimiter, metrics, async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -101,7 +107,7 @@ router.post('/auth/login', authLimiter, async (req: Request, res: Response) => {
     }
 });
 
-router.get('/auth/me', authLimiter, authMiddleware, async (req: Request, res: Response) => {
+router.get('/auth/me', authLimiter, metrics, authMiddleware, async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
         if (!userId) {
@@ -133,7 +139,7 @@ router.get('/auth/me', authLimiter, authMiddleware, async (req: Request, res: Re
 
 })
 
-router.post('/auth/logout', (req: Request, res: Response) => {
+router.post('/auth/logout', metrics, (req: Request, res: Response) => {
     res.clearCookie('token', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
