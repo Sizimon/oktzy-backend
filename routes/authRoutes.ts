@@ -24,7 +24,7 @@ const authLimiter = rateLimit({
 });
 
 const metrics = metricMiddleware({
-    service: 'auth-service',
+    service: 'oktzy-auth-service',
     url: 'https://szymonsamus.dev/api/metrics'
 });
 

@@ -5,7 +5,7 @@ import { metricMiddleware } from '../metricMiddleware.js';
 import pool from '../db/dbConnection.js';
 
 const metrics = metricMiddleware({
-    service: 'clip-service',
+    service: 'oktzy-clip-service',
     url: 'https://szymonsamus.dev/api/metrics'
 });
 
